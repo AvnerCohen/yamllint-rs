@@ -1,0 +1,21 @@
+---
+# BAD: Flow sequence when forbid: true
+flow_sequence: [true, 2, abc]
+
+# BAD: Non-empty flow sequence when forbid: non-empty
+non_empty_flow: [true, 2, abc]
+
+# BAD: Spaces inside brackets when min-spaces-inside: false, max-spaces-inside: false
+spaces_when_forbidden: [true, 2, abc]
+
+# BAD: Too many spaces inside brackets (min-spaces-inside: true, max-spaces-inside: 3)
+too_many_spaces: [true, 2, abc]
+
+# BAD: false spaces when required (min-spaces-inside: true, max-spaces-inside: 3)
+no_spaces_when_required: [1, 2, abc]
+
+# BAD: Spaces in empty brackets when min-spaces-inside-empty: false, max-spaces-inside-empty: false
+spaces_in_empty: [ ]
+
+# BAD: false spaces in empty brackets when min-spaces-inside-empty: true, max-spaces-inside-empty: -1
+no_spaces_in_empty: []

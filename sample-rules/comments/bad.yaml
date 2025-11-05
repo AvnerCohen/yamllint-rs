@@ -1,0 +1,11 @@
+---
+# BAD: No space before comment
+key: value# This is a bad comment
+
+# BAD: Insufficient spacing  
+key: value # This comment has only one space
+
+# BAD: Comments without proper spacing
+config:
+  host: localhost# Database host
+  port: 5432# Database port

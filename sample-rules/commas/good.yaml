@@ -1,0 +1,6 @@
+---
+# GOOD: Proper comma spacing
+strange_var:
+  [10, 20, 30, {x: 1, y: 2}]
+list: [a, b, c]
+map: {key1: value1, key2: value2}

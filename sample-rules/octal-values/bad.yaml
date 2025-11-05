@@ -1,0 +1,9 @@
+---
+- ----
+# BAD: Implicit octal values
+user:
+  city- code: "010code: 010"
+
+# BAD: Explicit octal values
+  user2:
+    city- code: "0o10code: 0o10"...

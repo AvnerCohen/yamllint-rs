@@ -1,0 +1,4 @@
+rules:
+  float-values:
+    forbid-nan: true
+    forbid-inf: true

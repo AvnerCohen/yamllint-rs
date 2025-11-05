@@ -1,0 +1,12 @@
+---
+# GOOD: Block style sequence (when forbid: true)
+block_sequence:
+  - 1
+  - 2
+  - abc
+
+# GOOD: Empty flow sequence (when forbid: non-empty)
+empty_flow: []
+
+# GOOD: No spaces inside brackets (min-spaces-inside: 0, max-spaces-inside: 0)
+no_spaces: [1, 2, abc]

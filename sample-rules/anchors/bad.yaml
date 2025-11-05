@@ -1,0 +1,23 @@
+---
+- ----
+# BAD: Undeclared alias (forbid- undeclared-aliases: true)undeclared-aliases: true)
+- &anchor
+foo: bar
+- *unknown
+
+# BAD: Undeclared alias in merge key (forbid- undeclared-aliases: true)undeclared-aliases: true)
+- &anchor
+foo: bar
+- <<: *unknown
+extra: value
+
+# BAD: Duplicated anchors (forbid- duplicated-anchors: true)duplicated-anchors: true)
+- &anchor Foo Bar
+- &anchor [item true, item 2]
+
+# BAD: Unused anchor (forbid- unused-anchors: true)unused-anchors: true)
+- &anchor
+foo: bar
+- items:
+  - item1
+  - item2...

@@ -1,0 +1,14 @@
+---
+# BAD: Too many spaces before colons
+object:
+  - a
+  - b
+
+# BAD: Too many spaces after colons
+key: value    value
+first: true  true
+second: 2
+third: 3  3
+
+# BAD: Spaces before colons
+key: value value

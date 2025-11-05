@@ -1,0 +1,11 @@
+---
+# BAD: Lines with trailing spaces (spaces at end of lines)
+this document contains  
+trailing spaces  
+on lines 1 and 3
+
+# BAD: Mixed content with trailing spaces
+key1: value1  
+key2: value2
+nested:  
+  subkey: subvalue  

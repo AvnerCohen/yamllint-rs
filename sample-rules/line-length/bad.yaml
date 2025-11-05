@@ -1,0 +1,4 @@
+---
+# BAD: Lines exceeding the limit (max: 80)
+this_is_a_very_long_line_that_exceeds_the_maximum_line_length_limit_and_should_trigger_an_error: value
+another_extremely_long_line_with_many_characters_that_goes_way_beyond_the_recommended_line_length: another_value

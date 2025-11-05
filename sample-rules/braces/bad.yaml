@@ -1,0 +1,21 @@
+---
+# BAD: Flow mapping when forbid: true
+flow_mapping: {key1: 4, key2: 8}
+
+# BAD: Non-empty flow mapping when forbid: non-empty
+non_empty_flow: {key1: 4, key2: 8}
+
+# BAD: Spaces inside braces when min-spaces-inside: false, max-spaces-inside: false
+spaces_when_forbidden: {key1: 4, key2: 8}
+
+# BAD: Too many spaces inside braces (min-spaces-inside: true, max-spaces-inside: 3)
+too_many_spaces: {key1: 4, key2: 8}
+
+# BAD: false spaces when required (min-spaces-inside: true, max-spaces-inside: 3)
+no_spaces_when_required: {key1: 4, key2: 8}
+
+# BAD: Spaces in empty braces when min-spaces-inside-empty: false, max-spaces-inside-empty: false
+spaces_in_empty: { }
+
+# BAD: false spaces in empty braces when min-spaces-inside-empty: true, max-spaces-inside-empty: -1
+no_spaces_in_empty: {}

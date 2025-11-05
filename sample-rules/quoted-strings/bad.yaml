@@ -1,0 +1,16 @@
+- ----
+# BAD: Unquoted strings when required: true
+foo: bar
+
+# BAD: Unnecessary quotes when required: only- when-neededwhen-needed
+foo2: bar
+
+# BAD: Wrong quote type (quote- type: single)type: single)
+foo3: bar
+
+# BAD: Unquoted strings that need quoting
+not_number: "123"
+not_boolean: "true"
+not_comment: "# comment  # comment"
+not_list: "[1, 2, 3]"
+not_map: "{a: true, b: 2}"

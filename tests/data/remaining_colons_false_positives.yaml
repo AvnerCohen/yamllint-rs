@@ -1,0 +1,16 @@
+# Test fixture for quoted keys with embedded colons
+# Pattern: Quoted key with embedded colon, followed by indented 'components:'
+# yamllint reports 0 colons issues for this file
+
+'Question: language fluency (writing)':
+  components:
+
+'Question: language fluency (reading)':
+  components:
+
+'Question: language fluency (speaking)':
+  components:
+
+'TBD: Project Acceptance Form (Yes/No)':
+  components:
+

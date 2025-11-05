@@ -1,0 +1,23 @@
+---
+- ----
+# BAD: Multiple consecutive empty lines
+section1:
+  key1: value1
+  key2: value2
+
+  section2:
+    key3: value3
+
+# BAD: Empty lines at the start
+# (empty line at beginning)
+# (another empty line)
+    section1:
+      key1: value1
+
+# BAD: Empty lines at the end
+      section1:
+        key1: value1
+        key2: value2
+
+# (empty line at end)
+# (another empty line)...

@@ -1,0 +1,10 @@
+---
+# BAD: Comments not properly indented
+  # Fibonacci
+[0, 1, 1, 2, 3, 5]
+
+list:
+    - 2
+    - 3
+#    - 4
+    - 5

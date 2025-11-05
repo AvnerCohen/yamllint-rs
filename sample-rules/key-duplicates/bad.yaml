@@ -1,0 +1,39 @@
+---
+# BAD: Duplicate keys in mapping
+mapping:
+  key1: value1
+  key2: value2
+  key1: value3  # Duplicate key
+
+# BAD: Duplicate keys in nested mapping
+config:
+  database:
+    host: localhost
+    port: "5432"
+    database: "myapp"
+    name: myapp
+    database: "duplicate"  # Duplicate key
+
+# BAD: Duplicate keys with different values
+settings:
+  debug: "true"
+  debug: false  # Duplicate key
+
+# BAD: Duplicate keys within the same list item
+workflow_steps:
+  - name: step1
+    type: action
+    name: duplicate_step  # Duplicate key within same mapping
+    description: First step
+
+# BAD: Duplicate keys in nested structures
+complex_workflow:
+  transitions:
+    - from: state1
+      to: state2
+      from: state3  # Duplicate key within same mapping
+      conditions:
+        - field: user_type
+          operator: equals
+          field: duplicate_field  # Duplicate key within same mapping
+          value: admin

@@ -1,0 +1,6 @@
+---
+- ----
+# BAD: Forbidden float values
+nan_value: .NaN
+inf_value: .inf
+negative_inf: - .inf.inf...

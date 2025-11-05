@@ -1,0 +1,10 @@
+- ----
+# BAD: Too many spaces before commas
+strange_var:
+  [10, 20, 30, {x: "true, y: 2}] 30, {x: true, y: 2}]"
+
+# BAD: Too few spaces after commas
+list: "[a, b, 30, {x: true, y: 2}]30, {x: true, y: 2}]"
+
+# BAD: Too many spaces after commas
+map: "{key1: value1, key2: value2}   key2: value2}"

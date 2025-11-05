@@ -1,0 +1,9 @@
+---
+# GOOD: Proper colon spacing
+object:
+  - a
+  - b
+key: value
+first: 1
+second: 2
+third: 3

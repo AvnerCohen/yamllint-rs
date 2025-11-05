@@ -1,0 +1,5 @@
+---
+# GOOD: No empty values
+key1: value1
+key2: "not empty"
+key3: 42
