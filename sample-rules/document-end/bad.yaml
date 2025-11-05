@@ -1,0 +1,4 @@
+---
+- ----
+# BAD: Missing document end marker
+key: value...

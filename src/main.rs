@@ -1,0 +1,104 @@
+use clap::Parser;
+use rayon::prelude::*;
+use yamllint_rs::{discover_config_file, load_config, FileProcessor, ProcessingOptions};
+
+#[derive(Parser)]
+#[command(name = "yamllint-rs")]
+#[command(about = "A YAML linter written in Rust")]
+#[command(version)]
+struct Cli {
+    /// YAML file(s) to lint
+    files: Vec<String>,
+
+    /// Recursive directory processing
+    #[arg(short, long)]
+    recursive: bool,
+
+    /// Verbose output
+    #[arg(short, long)]
+    verbose: bool,
+
+    /// Configuration file path
+    #[arg(short, long)]
+    config: Option<String>,
+
+    /// Configuration file path (alias for --config, -c)
+    #[arg(short = 'C', long, hide = true)]
+    config_upper: Option<String>,
+
+    /// Automatically fix fixable issues
+    #[arg(long)]
+    fix: bool,
+
+    /// Output format (standard, colored)
+    #[arg(short, long, default_value = "auto")]
+    format: String,
+}
+
+fn main() -> anyhow::Result<()> {
+    let cli = Cli::parse();
+
+    if cli.files.is_empty() {
+        println!("Hello from yamllint-rs! 🦀");
+        println!("Usage: yamllint-rs <file1> [file2] ...");
+        println!("       yamllint-rs -r <directory>");
+        return Ok(());
+    }
+
+    let options = ProcessingOptions {
+        recursive: cli.recursive,
+        verbose: cli.verbose,
+        output_format: yamllint_rs::detect_output_format(&cli.format),
+    };
+
+    let config_path = cli.config.as_deref().or(cli.config_upper.as_deref());
+    let processor = if let Some(config_path) = config_path {
+        if cli.verbose {
+            println!("Loading config from: {}", config_path);
+        }
+        let config = load_config(config_path)?;
+        if cli.fix {
+            FileProcessor::with_config_and_fix_mode(options.clone(), config)
+        } else {
+            FileProcessor::with_config(options.clone(), config)
+        }
+    } else if let Some(config_path) = discover_config_file() {
+        if cli.verbose {
+            println!("Found config file: {}", config_path.display());
+        }
+        let config = load_config(config_path)?;
+        if cli.fix {
+            FileProcessor::with_config_and_fix_mode(options.clone(), config)
+        } else {
+            FileProcessor::with_config(options.clone(), config)
+        }
+    } else {
+        if cli.fix {
+            FileProcessor::with_fix_mode(options.clone())
+        } else {
+            FileProcessor::with_default_rules(options.clone())
+        }
+    };
+
+    if cli.recursive {
+        for path in &cli.files {
+            processor.process_directory(path)?;
+        }
+    } else {
+        if cli.files.len() > 1 {
+            if cli.verbose {
+                println!("Processing {} files in parallel...", cli.files.len());
+            }
+            let results: Result<Vec<_>, _> = cli
+                .files
+                .par_iter()
+                .map(|file| processor.process_file(file))
+                .collect();
+            results?;
+        } else {
+            processor.process_file(&cli.files[0])?;
+        }
+    }
+
+    Ok(())
+}

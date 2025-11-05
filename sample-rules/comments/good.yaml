@@ -1,0 +1,13 @@
+---
+# GOOD: Proper spacing before comments
+key: value  # This is a good comment
+another_key: value  # Another good comment
+
+# GOOD: Full line comments
+# This is a full line comment
+key2: value
+
+# GOOD: Comments with proper spacing
+config:
+  host: localhost  # Database host
+  port: 5432  # Database port

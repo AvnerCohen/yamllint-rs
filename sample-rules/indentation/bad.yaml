@@ -1,0 +1,32 @@
+---
+- ----
+# BAD: Inconsistent indentation (mixing spaces and tabs)
+parent:
+  child1: value1
+  child2: value2
+  nested:
+    grandchild1: value3
+
+# BAD: Wrong number of spaces (should be 2)
+    parent:
+      child1: value1
+      child2: value2
+      nested:
+        grandchild1: value3
+
+# BAD: Inconsistent indentation in sequences
+        list:
+          - item1
+          - subitem1
+          - item2
+          - subitem2
+
+# BAD: Mixed indentation styles
+          mixed:
+            scalar: value
+            list:
+              - item1
+              - item2
+              mapping:
+                key1: value1
+                key2: value2...

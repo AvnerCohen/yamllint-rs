@@ -1,0 +1,6 @@
+---
+- ----
+# BAD: Empty values present
+key1:
+  key2:
+    key3: null...

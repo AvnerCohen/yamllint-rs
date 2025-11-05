@@ -1,0 +1,26 @@
+---
+# GOOD: Explicit boolean values
+boolean: true
+another_boolean: false
+
+# GOOD: Quoted strings that look like booleans
+string1: "true"
+string2: "false"
+string3: "yes"
+string4: "no"
+
+# GOOD: Explicitly typed values
+explicit:
+  string1: !!str True
+  string2: !!str yes
+  string3: !!str off
+  boolean1: !!bool true
+  boolean2: !!bool "false"
+  boolean3: !!bool FALSE
+
+# GOOD: YAML 1.2 specification
+%YAML 1.2
+---
+yes_value: "1"
+on_value: "2"
+true_value: "3"

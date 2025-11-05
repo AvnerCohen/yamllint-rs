@@ -1,0 +1,5 @@
+---
+# GOOD: Lines within the limit (max: 80)
+short_line: value
+another_short_line: another_value
+this_is_a_reasonably_long_line_but_still_under_limit: value

@@ -1,0 +1,19 @@
+---
+# GOOD: All strings quoted (required: true)
+foo: "bar"
+bar: 'foo'
+number: 123
+boolean: true
+
+# GOOD: Only when needed (required: only-when-needed)
+foo2: "bar"
+bar2: "foo"
+not_number: '123'
+not_boolean: 'true'
+not_comment: '# comment'
+not_list: '[1, 2, 3]'
+not_map: '{a: 1, b: 2}'
+
+# GOOD: Single quotes only (quote-type: single)
+foo3: 'bar'
+bar3: 'foo'

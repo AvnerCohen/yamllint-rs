@@ -1,0 +1,3 @@
+rules:
+  hyphens:
+    max-spaces-after: 1

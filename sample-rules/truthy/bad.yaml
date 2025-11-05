@@ -1,0 +1,20 @@
+---
+# BAD: Implicit truthy values
+object: {True: 1, 1: True}
+
+# BAD: YAML 1.1 truthy values (when using YAML 1.1)
+%YAML 1.1
+---
+yes: 1
+on: 2
+True: 3
+
+# BAD: Unquoted truthy values
+yes: 1
+on: 2
+true: 3
+
+# BAD: Truthy values in keys
+yes: Yes
+on: On
+true: True

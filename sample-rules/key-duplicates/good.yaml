@@ -1,0 +1,40 @@
+---
+# GOOD: No duplicate keys
+mapping:
+  key1: value1
+  key2: value2
+  key3: value3
+
+# GOOD: Different keys with similar names
+config:
+  database_host: localhost
+  database_port: 5432
+  database_name: myapp
+
+# GOOD: List of mappings - same keys in different list items are allowed
+workflow_steps:
+  - name: step1
+    type: action
+    description: First step
+  - name: step2
+    type: condition
+    description: Second step
+  - name: step3
+    type: action
+    description: Third step
+
+# GOOD: Nested list structures with same keys
+complex_workflow:
+  transitions:
+    - from: state1
+      to: state2
+      conditions:
+        - field: user_type
+          operator: equals
+          value: admin
+    - from: state2
+      to: state3
+      conditions:
+        - field: user_type
+          operator: equals
+          value: user

@@ -1,0 +1,9 @@
+---
+# GOOD: No trailing spaces
+document: "this document doesn't contain any trailing spaces"
+
+# GOOD: Clean lines with proper content
+key1: value1
+key2: value2
+nested:
+  subkey: subvalue

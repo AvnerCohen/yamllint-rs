@@ -1,0 +1,9 @@
+---
+# GOOD: Quoted strings that look like octal
+user:
+  city-code: '010'
+  phone: '010,021'
+
+# GOOD: Quoted explicit octal
+user2:
+  city-code: '0o10'

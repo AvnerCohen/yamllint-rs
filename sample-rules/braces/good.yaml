@@ -1,0 +1,14 @@
+---
+# GOOD: Block style mapping (when forbid: true)
+block_mapping:
+  key1: 4
+  key2: 8
+
+# GOOD: Empty flow mapping (when forbid: non-empty)
+empty_flow: {}
+
+# GOOD: No spaces inside braces (min-spaces-inside: 0, max-spaces-inside: 0)
+no_spaces: {key1: 4, key2: 8}
+
+# GOOD: No spaces in empty braces (min-spaces-inside-empty: 0, max-spaces-inside-empty: 0)
+no_spaces_empty: {}

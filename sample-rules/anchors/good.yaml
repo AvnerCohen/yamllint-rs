@@ -1,0 +1,15 @@
+---
+# GOOD: Proper anchor and alias usage
+- &anchor
+  foo: bar
+- *anchor
+
+# GOOD: Multiple different anchors
+- &anchor1 Foo Bar
+- &anchor2 [item 1, item 2]
+
+# GOOD: Anchor used in merge key
+- &anchor
+  foo: bar
+- <<: *anchor
+  extra: value

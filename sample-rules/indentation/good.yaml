@@ -1,0 +1,25 @@
+# GOOD: Consistent 2-space indentation
+parent:
+  child1: value1
+  child2: value2
+  nested:
+    grandchild1: value3
+    grandchild2: value4
+
+# GOOD: Properly indented sequences
+list:
+  - item1
+  - item2
+  - nested:
+      - subitem1
+      - subitem2
+
+# GOOD: Mixed content with consistent indentation
+mixed:
+  scalar: value
+  list:
+    - item1
+    - item2
+  mapping:
+    key1: value1
+    key2: value2

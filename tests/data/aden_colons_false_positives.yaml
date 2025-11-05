@@ -1,0 +1,32 @@
+# Test fixture for quoted keys with embedded colons
+# Contains quoted keys with embedded colons that should NOT trigger colons spacing violations
+# yamllint reports 0 colons issues for this file
+# yamllint-rs currently reports false positives on lines with quoted keys followed by "components:"
+
+item1:
+  integration_id: '001'
+  'Question: language fluency (writing)':
+    components:
+    - id: Required language writing proficiency
+      integration_id: '10001'
+
+item2:
+  integration_id: '002'
+  'Question: language fluency (reading)':
+    components:
+    - id: Required language reading proficiency
+      integration_id: '10002'
+
+item3:
+  integration_id: '003'
+  'Question: language fluency (speaking)':
+    components:
+    - id: Required language speaking proficiency
+      integration_id: '10003'
+
+item4:
+  integration_id: '004'
+  'TBD: Project Acceptance Form (Yes/No)':
+    components:
+    - id: Do you accept this item?
+      integration_id: '10004'

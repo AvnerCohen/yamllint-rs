@@ -1,0 +1,4 @@
+---
+# BAD: File does not end with newline
+key1: value1
+key2: value2
