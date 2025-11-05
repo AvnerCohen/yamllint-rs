@@ -6,6 +6,7 @@ authors = ["Avner Cohen <israbirding@gmail.com>"]
 description = "A YAML linter written in Rust"
 license = "MIT"
 repository = "https://github.com/AvnerCohen/yamllint-rs"
+readme = "README.md"
 keywords = ["yaml", "lint", "linter", "yaml-lint"]
 categories = ["development-tools", "command-line-utilities"]
 
