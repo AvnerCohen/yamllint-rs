@@ -41,8 +41,7 @@ fn test_auto_recursive_directory() {
     fs::write(&file2, "key2: value2\t\t\n").unwrap();
 
     let mut cmd = assert_cmd::Command::cargo_bin("yamllint-rs").unwrap();
-    cmd.arg("--verbose")
-        .arg(temp_dir.path().to_str().unwrap());
+    cmd.arg("--verbose").arg(temp_dir.path().to_str().unwrap());
 
     cmd.assert()
         .success()
