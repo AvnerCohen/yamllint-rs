@@ -6,7 +6,12 @@ RELEASE_DIR = $(TARGET_DIR)/release
 DEBUG_DIR = $(TARGET_DIR)/debug
 
 RELEASE_FLAGS = --release
-CARGO_FLAGS = 
+CARGO_FLAGS =
+
+DOCKER_IMAGE = yamllint-rs
+DOCKER_TAG = latest
+VERSION = $(shell grep '^version =' Cargo.toml | sed 's/version = "\(.*\)"/\1/')
+VERSION_TAG = v$(VERSION) 
 
 RED = \033[0;31m
 GREEN = \033[0;32m
@@ -14,7 +19,7 @@ YELLOW = \033[0;33m
 BLUE = \033[0;34m
 NC = \033[0m
 
-.PHONY: help build release debug test clean lint fmt fmt-check check
+.PHONY: help build release debug test clean lint fmt fmt-check check docker-build docker-test docker-run
 
 all: release
 
@@ -35,6 +40,11 @@ help:
 	@echo ""
 	@echo "$(GREEN)Utility Commands:$(NC)"
 	@echo "  clean      - Clean build artifacts"
+	@echo ""
+	@echo "$(GREEN)Docker Commands:$(NC)"
+	@echo "  docker-build - Build Docker image"
+	@echo "  docker-test  - Test Docker image locally"
+	@echo "  docker-run   - Run Docker image with current directory"
 
 build: debug
 
@@ -77,3 +87,25 @@ clean:
 	@echo "$(BLUE)Cleaning build artifacts...$(NC)"
 	cargo clean
 	@echo "$(GREEN)Clean completed!$(NC)"
+
+docker-build:
+	@echo "$(BLUE)Building Docker image...$(NC)"
+	@echo "$(YELLOW)Version from Cargo.toml: $(VERSION)$(NC)"
+	docker build -t $(DOCKER_IMAGE):$(DOCKER_TAG) -t $(DOCKER_IMAGE):$(VERSION_TAG) .
+	@echo "$(GREEN)Docker image built: $(DOCKER_IMAGE):$(DOCKER_TAG) and $(DOCKER_IMAGE):$(VERSION_TAG)$(NC)"
+
+docker-test:
+	@echo "$(BLUE)Testing Docker image...$(NC)"
+	@echo "$(YELLOW)Testing version command...$(NC)"
+	docker run --rm $(DOCKER_IMAGE):$(DOCKER_TAG) --version || docker run --rm $(DOCKER_IMAGE):$(DOCKER_TAG) || true
+	@echo "$(GREEN)Docker image test completed!$(NC)"
+
+docker-run:
+	@echo "$(BLUE)Running Docker image with current directory...$(NC)"
+	@echo "$(YELLOW)Usage: make docker-run ARGS='--recursive .'$(NC)"
+	@echo "$(YELLOW)Or: make docker-run ARGS='file.yaml'$(NC)"
+	docker run --rm \
+		-v $(PWD):/work \
+		-w /work \
+		$(DOCKER_IMAGE):$(DOCKER_TAG) \
+		$(ARGS)

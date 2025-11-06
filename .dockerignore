@@ -1,0 +1,47 @@
+# Rust build artifacts
+target/
+**/*.rs.bk
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+
+# CI/CD
+.github/
+.circleci/
+
+# Documentation
+*.md
+!README.md
+
+# Tests
+tests/
+sample-rules/
+examples/
+
+# Other
+.env
+.env.*
+*.tmp
+*.temp
+.tool-versions
+
