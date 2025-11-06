@@ -34,6 +34,35 @@ cargo build --release
 cargo install yamllint-rs
 ```
 
+### Using Docker
+
+yamllint-rs is available as a Docker image on Docker Hub. No installation required - just run it directly:
+
+```bash
+# Lint a single file
+docker run --rm -v $(pwd):/work -w /work yamllint-rs:latest file.yaml
+
+# Lint multiple files
+docker run --rm -v $(pwd):/work -w /work yamllint-rs:latest file1.yaml file2.yaml
+
+# Recursive directory processing
+docker run --rm -v $(pwd):/work -w /work yamllint-rs:latest --recursive .
+
+# Verbose output
+docker run --rm -v $(pwd):/work -w /work yamllint-rs:latest --verbose file.yaml
+
+# Use custom config file
+docker run --rm -v $(pwd):/work -w /work yamllint-rs:latest --config .yamllint.yaml file.yaml
+
+# Automatically fix fixable issues
+docker run --rm -v $(pwd):/work -w /work yamllint-rs:latest --fix file.yaml
+
+# Use specific version
+docker run --rm -v $(pwd):/work -w /work yamllint-rs:v0.1.1 file.yaml
+```
+
+**Note:** Replace `yamllint-rs` with your Docker Hub username/organization if the image is published under a different namespace (e.g., `yourusername/yamllint-rs:latest`).
+
 ## Usage
 
 ### Command Line
