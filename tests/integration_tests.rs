@@ -239,3 +239,80 @@ rules:
             "BUG: File in account_settings/ should be ignored. yamllint-rs currently does NOT respect ignore patterns");
     println!("SUCCESS: Ignore patterns are working correctly!");
 }
+
+#[test]
+fn test_top_level_ignore_folder() {
+    let temp_dir = TempDir::new().unwrap();
+    let ignored_dir = temp_dir.path().join("venv");
+    fs::create_dir_all(&ignored_dir).unwrap();
+
+    let ignored_file = ignored_dir.join("config.yaml");
+    let normal_file = temp_dir.path().join("normal.yaml");
+    let config_file = temp_dir.path().join(".yamllint");
+
+    let test_content = "key: value\n  bad_indent: wrong\n";
+    fs::write(&ignored_file, test_content).unwrap();
+    fs::write(&normal_file, test_content).unwrap();
+
+    let config_content = r#"
+extends: default
+ignore: |
+  venv/
+rules:
+  indentation:
+    enabled: true
+"#;
+    fs::write(&config_file, config_content).unwrap();
+
+    let mut cmd = assert_cmd::Command::cargo_bin("yamllint-rs").unwrap();
+    cmd.current_dir(temp_dir.path()).arg("-r").arg(".");
+
+    let output = cmd.assert().success();
+    let stdout = String::from_utf8_lossy(&output.get_output().stdout);
+
+    assert!(
+        !stdout.contains("venv/config.yaml"),
+        "Files in venv/ should be ignored by top-level ignore"
+    );
+    assert!(
+        stdout.contains("normal.yaml"),
+        "Files not in ignored directories should still be processed"
+    );
+}
+
+#[test]
+fn test_top_level_ignore_file() {
+    let temp_dir = TempDir::new().unwrap();
+    let ignored_file = temp_dir.path().join("ignored.yaml");
+    let normal_file = temp_dir.path().join("normal.yaml");
+    let config_file = temp_dir.path().join(".yamllint");
+
+    let test_content = "key: value\n  bad_indent: wrong\n";
+    fs::write(&ignored_file, test_content).unwrap();
+    fs::write(&normal_file, test_content).unwrap();
+
+    let config_content = r#"
+extends: default
+ignore: |
+  ignored.yaml
+rules:
+  indentation:
+    enabled: true
+"#;
+    fs::write(&config_file, config_content).unwrap();
+
+    let mut cmd = assert_cmd::Command::cargo_bin("yamllint-rs").unwrap();
+    cmd.current_dir(temp_dir.path()).arg("-r").arg(".");
+
+    let output = cmd.assert().success();
+    let stdout = String::from_utf8_lossy(&output.get_output().stdout);
+
+    assert!(
+        !stdout.contains("ignored.yaml"),
+        "ignored.yaml should be ignored by top-level ignore"
+    );
+    assert!(
+        stdout.contains("normal.yaml"),
+        "Files not in ignore list should still be processed"
+    );
+}
