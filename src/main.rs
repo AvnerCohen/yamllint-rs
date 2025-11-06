@@ -1,5 +1,6 @@
 use clap::Parser;
 use rayon::prelude::*;
+use std::path::Path;
 use yamllint_rs::{discover_config_file, load_config, FileProcessor, ProcessingOptions};
 
 #[derive(Parser)]
@@ -41,7 +42,7 @@ fn main() -> anyhow::Result<()> {
     if cli.files.is_empty() {
         println!("Hello from yamllint-rs! 🦀");
         println!("Usage: yamllint-rs <file1> [file2] ...");
-        println!("       yamllint-rs -r <directory>");
+        println!("       yamllint-rs <directory>");
         return Ok(());
     }
 
@@ -80,23 +81,36 @@ fn main() -> anyhow::Result<()> {
         }
     };
 
-    if cli.recursive {
-        for path in &cli.files {
+    let mut directories = Vec::new();
+    let mut files = Vec::new();
+
+    for path_str in &cli.files {
+        let path = Path::new(path_str);
+        if cli.recursive || path.is_dir() {
+            directories.push(path_str);
+        } else {
+            files.push(path_str);
+        }
+    }
+
+    if !directories.is_empty() {
+        for path in directories {
             processor.process_directory(path)?;
         }
-    } else {
-        if cli.files.len() > 1 {
+    }
+
+    if !files.is_empty() {
+        if files.len() > 1 {
             if cli.verbose {
-                println!("Processing {} files in parallel...", cli.files.len());
+                println!("Processing {} files in parallel...", files.len());
             }
-            let results: Result<Vec<_>, _> = cli
-                .files
+            let results: Result<Vec<_>, _> = files
                 .par_iter()
                 .map(|file| processor.process_file(file))
                 .collect();
             results?;
         } else {
-            processor.process_file(&cli.files[0])?;
+            processor.process_file(&files[0])?;
         }
     }
 
