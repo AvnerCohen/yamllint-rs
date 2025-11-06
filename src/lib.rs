@@ -164,6 +164,18 @@ impl FileProcessor {
 
     pub fn process_file<P: AsRef<Path>>(&self, file_path: P) -> Result<LintResult> {
         let path = file_path.as_ref();
+
+        if let Some(config) = &self.config {
+            let cwd = std::env::current_dir().ok();
+            let config_dir = cwd.as_deref();
+            if config.is_file_ignored(path, config_dir) {
+                return Ok(LintResult {
+                    file: self.get_relative_path(path),
+                    issues: vec![],
+                });
+            }
+        }
+
         let relative_path = self.get_relative_path(path);
 
         if self.options.verbose {
@@ -368,9 +380,15 @@ impl FileProcessor {
 
         for result in walker {
             let entry = result?;
-            let path = entry.path();
-            if path.is_file() && self.is_yaml_file(path) {
-                yaml_files.push(path.to_path_buf());
+            let file_path = entry.path();
+            if file_path.is_file() && self.is_yaml_file(file_path) {
+                if let Some(config) = &self.config {
+                    let config_dir = Some(path);
+                    if config.is_file_ignored(file_path, config_dir) {
+                        continue;
+                    }
+                }
+                yaml_files.push(file_path.to_path_buf());
             }
         }
 
@@ -617,7 +635,11 @@ fn parse_original_yamllint_format(content: &str) -> Result<config::Config> {
         })
         .unwrap_or(false);
 
-    if has_extends || has_rules_simple_format {
+    if has_extends {
+        return convert_original_yamllint_config(yaml_value);
+    }
+
+    if has_rules_simple_format {
         if let Some(rules) = yaml_value.get("rules") {
             if let Some(rules_map) = rules.as_mapping() {
                 let has_simple_values = rules_map
@@ -636,6 +658,28 @@ fn parse_original_yamllint_format(content: &str) -> Result<config::Config> {
 
 fn convert_original_yamllint_config(yaml_value: serde_yaml::Value) -> Result<config::Config> {
     let mut config = config::Config::new();
+
+    if let Some(ignore_val) = yaml_value.get("ignore") {
+        if let Some(ignore_str) = ignore_val.as_str() {
+            config.ignore = Some(ignore_str.to_string());
+        } else if let Some(ignore_seq) = ignore_val.as_sequence() {
+            let patterns: Vec<String> = ignore_seq
+                .iter()
+                .filter_map(|v| v.as_str().map(|s| s.to_string()))
+                .collect();
+            config.ignore = Some(patterns.join("\n"));
+        }
+    }
+
+    if let Some(ignore_from_file_val) = yaml_value.get("ignore-from-file") {
+        if let Some(ignore_file_str) = ignore_from_file_val.as_str() {
+            config.ignore_from_file = Some(ignore_file_str.to_string());
+        } else if let Some(ignore_file_seq) = ignore_from_file_val.as_sequence() {
+            if let Some(first_file) = ignore_file_seq.first().and_then(|v| v.as_str()) {
+                config.ignore_from_file = Some(first_file.to_string());
+            }
+        }
+    }
 
     if let Some(rules) = yaml_value.get("rules").and_then(|r| r.as_mapping()) {
         for (rule_name, rule_config) in rules {

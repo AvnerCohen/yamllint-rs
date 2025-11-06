@@ -3,6 +3,7 @@
 use crate::Severity;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::path::Path;
 
 /// Main configuration structure
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -11,6 +12,10 @@ pub struct Config {
     pub rules: HashMap<String, RuleConfig>,
     /// Global settings
     pub global: GlobalConfig,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ignore: Option<String>,
+    #[serde(rename = "ignore-from-file", skip_serializing_if = "Option::is_none")]
+    pub ignore_from_file: Option<String>,
 }
 
 /// Global configuration settings
@@ -131,6 +136,8 @@ impl Config {
                 enable_all_rules: Some(true),
                 enable_fix_mode: Some(false),
             },
+            ignore: None,
+            ignore_from_file: None,
         };
 
         // Set up default rule configurations
@@ -396,5 +403,108 @@ impl Config {
             .filter(|(_, config)| config.enabled.unwrap_or(true) == false)
             .map(|(id, _)| id.clone())
             .collect()
+    }
+
+    fn collect_ignore_patterns(&self, config_dir: Option<&Path>) -> Vec<String> {
+        let mut patterns = Vec::new();
+
+        if let Some(ignore_str) = &self.ignore {
+            for line in ignore_str.lines() {
+                let trimmed = line.trim();
+                if !trimmed.is_empty() && !trimmed.starts_with('#') {
+                    patterns.push(trimmed.to_string());
+                }
+            }
+        }
+
+        if let Some(ignore_file_path) = &self.ignore_from_file {
+            let file_path = if let Some(config_dir) = config_dir {
+                if let Some(parent) = config_dir.parent() {
+                    parent.join(ignore_file_path)
+                } else {
+                    config_dir.join(ignore_file_path)
+                }
+            } else {
+                Path::new(ignore_file_path).to_path_buf()
+            };
+
+            if let Ok(content) = std::fs::read_to_string(&file_path) {
+                for line in content.lines() {
+                    let trimmed = line.trim();
+                    if !trimmed.is_empty() && !trimmed.starts_with('#') {
+                        patterns.push(trimmed.to_string());
+                    }
+                }
+            }
+        }
+
+        patterns
+    }
+
+    pub fn is_file_ignored(&self, file_path: &Path, config_dir: Option<&Path>) -> bool {
+        let patterns = self.collect_ignore_patterns(config_dir);
+        if patterns.is_empty() {
+            return false;
+        }
+
+        let file_path_normalized = if let Some(base_dir) = config_dir {
+            if let Ok(relative) = file_path.strip_prefix(base_dir) {
+                let rel_str = relative.to_string_lossy().replace('\\', "/");
+                if rel_str.starts_with('/') {
+                    rel_str[1..].to_string()
+                } else {
+                    rel_str
+                }
+            } else {
+                file_path.to_string_lossy().replace('\\', "/")
+            }
+        } else {
+            if let Ok(cwd) = std::env::current_dir() {
+                if let Ok(relative) = file_path.strip_prefix(&cwd) {
+                    let rel_str = relative.to_string_lossy().replace('\\', "/");
+                    if rel_str.starts_with('/') {
+                        rel_str[1..].to_string()
+                    } else {
+                        rel_str
+                    }
+                } else {
+                    file_path.to_string_lossy().replace('\\', "/")
+                }
+            } else {
+                file_path.to_string_lossy().replace('\\', "/")
+            }
+        };
+
+        for pattern in patterns {
+            let pattern_normalized = pattern.trim().replace('\\', "/");
+
+            if pattern_normalized.ends_with('/') {
+                let dir_pattern = pattern_normalized.trim_end_matches('/');
+                if !dir_pattern.is_empty() {
+                    if file_path_normalized == dir_pattern
+                        || file_path_normalized.starts_with(&format!("{}/", dir_pattern))
+                    {
+                        return true;
+                    }
+                }
+            } else {
+                let pattern_trimmed = pattern_normalized.trim();
+                if !pattern_trimmed.is_empty() {
+                    if file_path_normalized == pattern_trimmed {
+                        return true;
+                    }
+                    if file_path_normalized.ends_with(&format!("/{}", pattern_trimmed)) {
+                        return true;
+                    }
+                    if let Some(file_name) = file_path.file_name() {
+                        if file_name.to_string_lossy() == pattern_trimmed {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        false
     }
 }

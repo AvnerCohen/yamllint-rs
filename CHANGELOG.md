@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.3] - 2025-01-XX
+
+### Added
+- Top-level `ignore` and `ignore-from-file` configuration options for file-level exclusion
+- Support for gitwildmatch-style patterns in ignore configuration (matching Python yamllint behavior)
+- Files matching ignore patterns are now completely skipped from processing (not just rule-level ignored)
+
 ## [0.1.2] - 2025-11-06
 
 ### Added
