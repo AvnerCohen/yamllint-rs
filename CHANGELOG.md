@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.2] - 2025-11-06
+
+### Added
+- Multi-platform Docker build and push command (`docker-multi-push`) supporting both linux/amd64 and linux/arm64 architectures
+
 ## [0.1.1] - 2024-12-19
 
 ### Changed

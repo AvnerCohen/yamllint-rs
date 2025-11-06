@@ -19,7 +19,7 @@ YELLOW = \033[0;33m
 BLUE = \033[0;34m
 NC = \033[0m
 
-.PHONY: help build release debug test clean lint fmt fmt-check check docker-build docker-test docker-run
+.PHONY: help build release debug test clean lint fmt fmt-check check docker-build docker-test docker-run docker-multi-push
 
 all: release
 
@@ -42,9 +42,10 @@ help:
 	@echo "  clean      - Clean build artifacts"
 	@echo ""
 	@echo "$(GREEN)Docker Commands:$(NC)"
-	@echo "  docker-build - Build Docker image"
-	@echo "  docker-test  - Test Docker image locally"
-	@echo "  docker-run   - Run Docker image with current directory"
+	@echo "  docker-build      - Build Docker image (single platform, local)"
+	@echo "  docker-test        - Test Docker image locally"
+	@echo "  docker-run         - Run Docker image with current directory"
+	@echo "  docker-multi-push  - Build and push multi-platform image to Docker Hub"
 
 build: debug
 
@@ -109,3 +110,20 @@ docker-run:
 		-w /work \
 		$(DOCKER_IMAGE):$(DOCKER_TAG) \
 		$(ARGS)
+
+docker-multi-push:
+	@echo "$(BLUE)Building and pushing multi-platform Docker image...$(NC)"
+	@docker buildx version > /dev/null 2>&1 || (echo "$(RED)Error: docker buildx not available$(NC)" && exit 1)
+	@if [ -z "$(DOCKER_HUB_USER)" ]; then \
+		echo "$(RED)Error: DOCKER_HUB_USER not set$(NC)"; \
+		echo "$(YELLOW)Example: DOCKER_HUB_USER=avnerner make docker-multi-push$(NC)"; \
+		exit 1; \
+	fi
+	@echo "$(YELLOW)Version from Cargo.toml: $(VERSION)$(NC)"
+	@echo "$(YELLOW)Platforms: linux/amd64, linux/arm64$(NC)"
+	@echo "$(YELLOW)Docker Hub: $(DOCKER_HUB_USER)/$(DOCKER_IMAGE)$(NC)"
+	docker buildx build --platform linux/amd64,linux/arm64 \
+		-t $(DOCKER_HUB_USER)/$(DOCKER_IMAGE):$(DOCKER_TAG) \
+		-t $(DOCKER_HUB_USER)/$(DOCKER_IMAGE):$(VERSION_TAG) \
+		--push .
+	@echo "$(GREEN)Multi-platform image pushed: $(DOCKER_HUB_USER)/$(DOCKER_IMAGE):$(DOCKER_TAG) and $(DOCKER_HUB_USER)/$(DOCKER_IMAGE):$(VERSION_TAG)$(NC)"
