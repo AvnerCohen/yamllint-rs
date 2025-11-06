@@ -885,7 +885,7 @@ actual_flow: [ value1, value2 ]
 
         // After fix, we should only get 4 issues from actual flow sequences (2 per line)
         // Before fix, we'll get more (from brackets inside strings)
-        let flow_seq_line_numbers: Vec<usize> =
+        let _flow_seq_line_numbers: Vec<usize> =
             bracket_issues.iter().map(|issue| issue.line).collect();
 
         // Check that we detect some bracket issues

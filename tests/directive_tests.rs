@@ -71,7 +71,7 @@ normal: line
             .collect();
 
         // Other rules should still work
-        let other_issues: Vec<_> = result
+        let _other_issues: Vec<_> = result
             .issues
             .iter()
             .filter(|(_, rule_name)| rule_name != "line-length")
@@ -181,7 +181,7 @@ normal: line
             .filter(|(issue, rule_name)| issue.line == 2 && rule_name == "line-length")
             .collect();
 
-        let line2_other: Vec<_> = result
+        let _line2_other: Vec<_> = result
             .issues
             .iter()
             .filter(|(issue, rule_name)| issue.line == 2 && rule_name != "line-length")
@@ -284,7 +284,7 @@ normal: line
             .filter(|(_, rule_name)| rule_name == "line-length")
             .collect();
 
-        let line6_indentation: Vec<_> = line6_issues
+        let _line6_indentation: Vec<_> = line6_issues
             .iter()
             .filter(|(_, rule_name)| rule_name == "indentation")
             .collect();
@@ -354,7 +354,7 @@ normal: line
             .filter(|(issue, rule_name)| issue.line == 3 && rule_name == "line-length")
             .collect();
 
-        let line3_indentation: Vec<_> = result
+        let _line3_indentation: Vec<_> = result
             .issues
             .iter()
             .filter(|(issue, rule_name)| issue.line == 3 && rule_name == "indentation")
