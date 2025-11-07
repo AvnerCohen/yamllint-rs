@@ -3,6 +3,7 @@ use ignore::WalkBuilder;
 use rayon::prelude::*;
 use std::io::Write;
 use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 
 pub mod analysis;
@@ -23,6 +24,7 @@ pub struct ProcessingOptions {
     pub recursive: bool,
     pub verbose: bool,
     pub output_format: OutputFormat,
+    pub show_progress: bool,
 }
 
 impl Default for ProcessingOptions {
@@ -31,6 +33,7 @@ impl Default for ProcessingOptions {
             recursive: false,
             verbose: false,
             output_format: OutputFormat::Colored,
+            show_progress: true,
         }
     }
 }
@@ -360,7 +363,7 @@ impl FileProcessor {
         })
     }
 
-    pub fn process_directory<P: AsRef<Path>>(&self, dir_path: P) -> Result<()> {
+    pub fn process_directory<P: AsRef<Path>>(&self, dir_path: P) -> Result<usize> {
         let path = dir_path.as_ref();
 
         if !path.is_dir() {
@@ -396,7 +399,7 @@ impl FileProcessor {
             if self.options.verbose {
                 println!("No YAML files found in directory");
             }
-            return Ok(());
+            return Ok(0);
         }
 
         if self.options.verbose {
@@ -410,13 +413,36 @@ impl FileProcessor {
         let fix_mode = self.fix_mode;
         let shared_rules = self.rules.clone();
 
-        let results =
-            Self::process_files_list(&yaml_files, shared_rules, &options, fix_mode, &self.config)?;
+        let results = if options.show_progress {
+            let total = yaml_files.len();
+            let counter = Arc::new(AtomicUsize::new(0));
+            Self::process_files_list(
+                &yaml_files,
+                shared_rules,
+                &options,
+                fix_mode,
+                &self.config,
+                Some(counter),
+                Some(total),
+            )?
+        } else {
+            Self::process_files_list(
+                &yaml_files,
+                shared_rules,
+                &options,
+                fix_mode,
+                &self.config,
+                None,
+                None,
+            )?
+        };
 
         let formatter = formatter::create_formatter(options.output_format);
         let mut stdout = std::io::stdout().lock();
+        let mut total_issues = 0;
         for result in &results {
             if !result.issues.is_empty() {
+                total_issues += result.issues.len();
                 writeln!(stdout, "{}", formatter.format_filename(&result.file))?;
 
                 let mut output = String::with_capacity(result.issues.len() * 120);
@@ -438,7 +464,7 @@ impl FileProcessor {
             writeln!(stdout, "Completed processing {} files", yaml_files.len())?;
         }
 
-        Ok(())
+        Ok(total_issues)
     }
 
     fn is_yaml_file(&self, path: &Path) -> bool {
@@ -471,19 +497,37 @@ impl FileProcessor {
         options: &ProcessingOptions,
         fix_mode: bool,
         config: &Option<Arc<config::Config>>,
+        counter: Option<Arc<AtomicUsize>>,
+        total: Option<usize>,
     ) -> Result<Vec<LintResult>> {
         if files.len() > 3 {
             files
                 .par_iter()
                 .map(|file| {
-                    Self::process_single_file(rules.clone(), file, options, fix_mode, config)
+                    Self::process_single_file(
+                        rules.clone(),
+                        file,
+                        options,
+                        fix_mode,
+                        config,
+                        counter.as_ref().map(Arc::clone),
+                        total,
+                    )
                 })
                 .collect()
         } else {
             files
                 .iter()
                 .map(|file| {
-                    Self::process_single_file(rules.clone(), file, options, fix_mode, config)
+                    Self::process_single_file(
+                        rules.clone(),
+                        file,
+                        options,
+                        fix_mode,
+                        config,
+                        counter.as_ref().map(Arc::clone),
+                        total,
+                    )
                 })
                 .collect()
         }
@@ -495,6 +539,8 @@ impl FileProcessor {
         options: &ProcessingOptions,
         fix_mode: bool,
         config: &Option<Arc<config::Config>>,
+        counter: Option<Arc<AtomicUsize>>,
+        total: Option<usize>,
     ) -> Result<LintResult> {
         let relative_path = Self::get_relative_path_static(file_path);
 
@@ -504,7 +550,7 @@ impl FileProcessor {
 
         let content = std::fs::read_to_string(file_path)?;
 
-        if fix_mode {
+        let result = if fix_mode {
             Self::process_file_with_fixes_static(
                 &rules,
                 file_path,
@@ -514,7 +560,20 @@ impl FileProcessor {
             )
         } else {
             Self::process_file_check_only_static(&rules, &content, &relative_path, config)
+        }?;
+
+        if let (Some(counter), Some(total)) = (counter, total) {
+            let count = counter.fetch_add(1, Ordering::Relaxed) + 1;
+            if count % 1000 == 0 || count == total {
+                let percent = (count * 100) / total;
+                eprintln!(
+                    "[Progress] Processed {}/{} files ({}%)",
+                    count, total, percent
+                );
+            }
         }
+
+        Ok(result)
     }
 
     fn process_file_check_only_static(

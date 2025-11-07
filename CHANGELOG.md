@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.4] - 2025-01-XX
+
+### Fixed
+- Exit code now correctly returns 1 when linting issues are found (previously always returned 0)
+- Progress tracking shows accurate file counts during directory processing
+
+### Added
+- `--no-progress` flag to disable progress updates for quieter output
+- Progress updates every 1000 files processed (shows ~10-30 updates for large directories)
+
 ## [0.1.3] - 2025-01-XX
 
 ### Added

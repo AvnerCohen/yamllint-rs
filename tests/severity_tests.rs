@@ -153,7 +153,7 @@ rules:
         .arg(config_file.to_str().unwrap())
         .arg(test_file.to_str().unwrap());
 
-    let output = cmd.assert().success();
+    let output = cmd.assert().code(1);
 
     // Check that the output contains the severity levels
     let stdout = String::from_utf8(output.get_output().stdout.clone()).unwrap();
@@ -174,7 +174,7 @@ fn test_default_config_no_severity_override() {
     let mut cmd = assert_cmd::Command::cargo_bin("yamllint-rs").unwrap();
     cmd.arg(test_file.to_str().unwrap());
 
-    let output = cmd.assert().success();
+    let output = cmd.assert().code(1);
 
     // Check that the output contains "error" (default severity)
     let stdout = String::from_utf8(output.get_output().stdout.clone()).unwrap();
@@ -211,7 +211,7 @@ rules:
         .arg(config_file.to_str().unwrap())
         .arg(test_file.to_str().unwrap());
 
-    let output = cmd.assert().success();
+    let output = cmd.assert().code(1);
 
     // Should still work and use default severities (error)
     let stdout = String::from_utf8(output.get_output().stdout.clone()).unwrap();
@@ -286,7 +286,7 @@ rules:
             .arg(config_file.to_str().unwrap())
             .arg(test_file.to_str().unwrap());
 
-        let output = cmd.assert().success();
+        let output = cmd.assert().code(1);
         let stdout = String::from_utf8(output.get_output().stdout.clone()).unwrap();
         assert!(
             stdout.contains(expected_output),

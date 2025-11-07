@@ -55,7 +55,7 @@ rules:
         .arg(test_file.to_str().unwrap());
 
     cmd.assert()
-        .success()
+        .code(1)
         .stdout(predicate::str::contains("error"));
 }
 
@@ -86,7 +86,7 @@ rules:
         .arg(test_file.to_str().unwrap());
 
     cmd.assert()
-        .success()
+        .code(1)
         .stdout(predicate::str::contains("error"));
 }
 
@@ -151,7 +151,7 @@ rules:
         .arg(config_file.to_str().unwrap())
         .arg(test_file.to_str().unwrap());
 
-    let output = cmd.assert().success();
+    let output = cmd.assert().code(1);
     let stdout = String::from_utf8_lossy(&output.get_output().stdout);
 
     assert!(
@@ -267,7 +267,7 @@ rules:
     let mut cmd = assert_cmd::Command::cargo_bin("yamllint-rs").unwrap();
     cmd.current_dir(temp_dir.path()).arg("-r").arg(".");
 
-    let output = cmd.assert().success();
+    let output = cmd.assert().code(1);
     let stdout = String::from_utf8_lossy(&output.get_output().stdout);
 
     assert!(
@@ -304,7 +304,7 @@ rules:
     let mut cmd = assert_cmd::Command::cargo_bin("yamllint-rs").unwrap();
     cmd.current_dir(temp_dir.path()).arg("-r").arg(".");
 
-    let output = cmd.assert().success();
+    let output = cmd.assert().code(1);
     let stdout = String::from_utf8_lossy(&output.get_output().stdout);
 
     assert!(

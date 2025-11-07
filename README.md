@@ -89,6 +89,9 @@ yamllint-rs --fix file.yaml
 # Set output format (standard, colored, or auto)
 yamllint-rs --format colored file.yaml
 
+# Disable progress updates
+yamllint-rs --no-progress --recursive directory/
+
 # Combine options
 yamllint-rs -r --verbose --fix directory/
 ```
@@ -101,6 +104,7 @@ yamllint-rs -r --verbose --fix directory/
 - `-c, --config <path>` - Path to configuration file
 - `--fix` - Automatically fix fixable issues
 - `-f, --format <format>` - Output format: `standard`, `colored`, or `auto` (default: `auto`)
+- `--no-progress` - Disable progress updates during processing
 
 ### Configuration
 
@@ -141,6 +145,7 @@ let options = ProcessingOptions {
     recursive: false,
     verbose: false,
     output_format: OutputFormat::Colored,
+    show_progress: true,
 };
 
 let processor = FileProcessor::with_default_rules(options);
@@ -157,7 +162,7 @@ for (issue, rule_name) in result.issues {
 
 // Process directory recursively
 let processor = FileProcessor::with_default_rules(options);
-processor.process_directory("directory/")?;
+let issue_count = processor.process_directory("directory/")?;
 
 // Use custom configuration
 use yamllint_rs::{load_config, discover_config_file};

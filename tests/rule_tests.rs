@@ -18,7 +18,7 @@ fn test_line_length_rule() {
     cmd.arg(test_file.to_str().unwrap());
 
     cmd.assert()
-        .success()
+        .code(1)
         .stdout(predicate::str::contains("line too long"))
         .stdout(predicate::str::contains("> 80 characters"));
 }
@@ -37,7 +37,7 @@ fn test_trailing_spaces_rule() {
     cmd.arg(test_file.to_str().unwrap());
 
     cmd.assert()
-        .success()
+        .code(1)
         .stdout(predicate::str::contains("trailing spaces"))
         .stdout(predicate::str::contains("3 trailing characters"));
 }
@@ -56,7 +56,7 @@ fn test_multiple_rules() {
     cmd.arg(test_file.to_str().unwrap());
 
     cmd.assert()
-        .success()
+        .code(1)
         .stdout(predicate::str::contains("trailing spaces"))
         .stdout(predicate::str::contains("line too long"));
     // Note: Issue count may vary depending on enabled rules
@@ -102,7 +102,7 @@ fn test_rules_recursive() {
         .arg(temp_dir.path().to_str().unwrap());
 
     cmd.assert()
-        .success()
+        .code(1)
         .stdout(predicate::str::contains("trailing spaces"))
         .stdout(predicate::str::contains("line too long"));
 }
@@ -141,7 +141,7 @@ fn test_different_extensions() {
         .arg(temp_dir.path().to_str().unwrap());
 
     cmd.assert()
-        .success()
+        .code(1)
         .stdout(predicate::str::contains("trailing spaces"))
         .stdout(predicate::str::contains("test.yaml"))
         .stdout(predicate::str::contains("test.yml"));
@@ -173,7 +173,7 @@ fn test_whitespace_only_file() {
     cmd.arg(test_file.to_str().unwrap());
 
     cmd.assert()
-        .success()
+        .code(1)
         .stdout(predicate::str::contains("trailing spaces"));
 }
 
@@ -209,6 +209,6 @@ severity:
         .arg(test_file.to_str().unwrap());
 
     cmd.assert()
-        .success()
+        .code(1)
         .stdout(predicate::str::contains("non-fixable issues"));
 }

@@ -1,6 +1,7 @@
 use clap::Parser;
 use rayon::prelude::*;
 use std::path::Path;
+use std::process;
 use yamllint_rs::{discover_config_file, load_config, FileProcessor, ProcessingOptions};
 
 #[derive(Parser)]
@@ -34,6 +35,10 @@ struct Cli {
     /// Output format (standard, colored)
     #[arg(short, long, default_value = "auto")]
     format: String,
+
+    /// Disable progress updates
+    #[arg(long)]
+    no_progress: bool,
 }
 
 fn main() -> anyhow::Result<()> {
@@ -50,6 +55,7 @@ fn main() -> anyhow::Result<()> {
         recursive: cli.recursive,
         verbose: cli.verbose,
         output_format: yamllint_rs::detect_output_format(&cli.format),
+        show_progress: !cli.no_progress,
     };
 
     let config_path = cli.config.as_deref().or(cli.config_upper.as_deref());
@@ -93,9 +99,11 @@ fn main() -> anyhow::Result<()> {
         }
     }
 
+    let mut total_issues = 0;
+
     if !directories.is_empty() {
         for path in directories {
-            processor.process_directory(path)?;
+            total_issues += processor.process_directory(path)?;
         }
     }
 
@@ -108,10 +116,17 @@ fn main() -> anyhow::Result<()> {
                 .par_iter()
                 .map(|file| processor.process_file(file))
                 .collect();
-            results?;
+            for result in results? {
+                total_issues += result.issues.len();
+            }
         } else {
-            processor.process_file(&files[0])?;
+            let result = processor.process_file(&files[0])?;
+            total_issues += result.issues.len();
         }
+    }
+
+    if total_issues > 0 {
+        process::exit(1);
     }
 
     Ok(())

@@ -9,6 +9,7 @@ mod tests {
     fn create_processor() -> FileProcessor {
         let options = ProcessingOptions {
             recursive: false,
+            show_progress: false,
             verbose: false,
             output_format: OutputFormat::Standard,
         };

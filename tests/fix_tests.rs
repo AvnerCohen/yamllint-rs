@@ -53,7 +53,7 @@ fn test_fix_non_fixable_issues() {
     cmd.arg("--fix").arg(test_file.to_str().unwrap());
 
     cmd.assert()
-        .success()
+        .code(1)
         .stdout(predicate::str::contains("Fixed"))
         .stdout(predicate::str::contains("remaining"));
 
@@ -83,7 +83,7 @@ fn test_fix_mixed_issues() {
     cmd.arg("--fix").arg(test_file.to_str().unwrap());
 
     cmd.assert()
-        .success()
+        .code(1)
         .stdout(predicate::str::contains("Fixed"))
         .stdout(predicate::str::contains("fixable"));
 
@@ -196,7 +196,7 @@ fn test_rule_fix_capabilities() {
     cmd.arg(test_file.to_str().unwrap());
 
     cmd.assert()
-        .success()
+        .code(1)
         .stdout(predicate::str::contains("trailing spaces"));
 
     // Run with --fix to fix it

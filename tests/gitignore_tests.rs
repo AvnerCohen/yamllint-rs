@@ -48,6 +48,7 @@ fn test_gitignore_respect() {
         recursive: true,
         verbose: false,
         output_format: yamllint_rs::OutputFormat::Standard,
+        show_progress: false,
     };
 
     let processor = FileProcessor::with_default_rules(options);
@@ -103,6 +104,7 @@ fn test_gitignore_nested_patterns() {
         recursive: true,
         verbose: false,
         output_format: yamllint_rs::OutputFormat::Standard,
+        show_progress: false,
     };
 
     let processor = FileProcessor::with_default_rules(options);
@@ -132,6 +134,7 @@ fn test_no_gitignore_file() {
         recursive: true,
         verbose: false,
         output_format: yamllint_rs::OutputFormat::Standard,
+        show_progress: false,
     };
 
     let processor = FileProcessor::with_default_rules(options);

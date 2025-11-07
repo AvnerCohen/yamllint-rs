@@ -23,7 +23,7 @@ fn test_recursive_processing() {
         .arg(temp_dir.path().to_str().unwrap());
 
     cmd.assert()
-        .success()
+        .code(1)
         .stdout(predicate::str::contains("Processing directory"));
 }
 
@@ -44,7 +44,7 @@ fn test_auto_recursive_directory() {
     cmd.arg("--verbose").arg(temp_dir.path().to_str().unwrap());
 
     cmd.assert()
-        .success()
+        .code(1)
         .stdout(predicate::str::contains("Processing directory"));
 }
 

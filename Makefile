@@ -19,7 +19,7 @@ YELLOW = \033[0;33m
 BLUE = \033[0;34m
 NC = \033[0m
 
-.PHONY: help build release debug test clean lint fmt fmt-check check docker-build docker-test docker-run docker-multi-push
+.PHONY: help build release debug test clean lint fmt fmt-check check docker-build docker-test docker-run docker-multi-push build-binaries
 
 all: release
 
@@ -46,6 +46,7 @@ help:
 	@echo "  docker-test        - Test Docker image locally"
 	@echo "  docker-run         - Run Docker image with current directory"
 	@echo "  docker-multi-push  - Build and push multi-platform image to Docker Hub"
+	@echo "  build-binaries     - Build linux/amd64 and linux/arm64 binaries"
 
 build: debug
 
@@ -127,3 +128,19 @@ docker-multi-push:
 		-t $(DOCKER_HUB_USER)/$(DOCKER_IMAGE):$(VERSION_TAG) \
 		--push .
 	@echo "$(GREEN)Multi-platform image pushed: $(DOCKER_HUB_USER)/$(DOCKER_IMAGE):$(DOCKER_TAG) and $(DOCKER_HUB_USER)/$(DOCKER_IMAGE):$(VERSION_TAG)$(NC)"
+
+build-binaries:
+	@echo "$(BLUE)Building linux/amd64 binary...$(NC)"
+	@docker buildx build --platform linux/amd64 --target builder --load -t $(BINARY_NAME):builder-amd64 .
+	@docker create --name temp-amd64 --platform linux/amd64 $(BINARY_NAME):builder-amd64
+	@docker cp temp-amd64:/build/target/release/$(BINARY_NAME) ./$(BINARY_NAME)-linux-amd64
+	@docker rm temp-amd64
+	@chmod +x ./$(BINARY_NAME)-linux-amd64
+	@echo "$(GREEN)linux/amd64 binary built: $(BINARY_NAME)-linux-amd64$(NC)"
+	@echo "$(BLUE)Building linux/arm64 binary...$(NC)"
+	@docker buildx build --platform linux/arm64 --target builder --load -t $(BINARY_NAME):builder-arm64 .
+	@docker create --name temp-arm64 --platform linux/arm64 $(BINARY_NAME):builder-arm64
+	@docker cp temp-arm64:/build/target/release/$(BINARY_NAME) ./$(BINARY_NAME)-linux-arm64
+	@docker rm temp-arm64
+	@chmod +x ./$(BINARY_NAME)-linux-arm64
+	@echo "$(GREEN)linux/arm64 binary built: $(BINARY_NAME)-linux-arm64$(NC)"
