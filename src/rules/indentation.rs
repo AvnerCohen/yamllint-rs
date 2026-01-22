@@ -196,6 +196,10 @@ impl IndentationRule {
                 !matches!(token_type, TokenType::StreamStart(_) | TokenType::StreamEnd);
             let first_in_line = is_visible && marker.line() > cur_line;
 
+            // Clean up Val+Key context when moving to a new key/value pair.
+            // However, preserve them when entering nested block structures
+            // (BlockSequenceStart/BlockMappingStart) so indentation checking
+            // can still find the parent Key context.
             if stack.len() >= 2
                 && stack.last().unwrap().parent_type == ParentType::Val
                 && !matches!(
@@ -204,6 +208,8 @@ impl IndentationRule {
                         | TokenType::Tag(_, _)
                         | TokenType::Alias(_)
                         | TokenType::BlockEntry
+                        | TokenType::BlockSequenceStart
+                        | TokenType::BlockMappingStart
                 )
             {
                 if stack[stack.len() - 2].parent_type == ParentType::Key {
@@ -497,5 +503,47 @@ mod tests {
         let content = "items:\n  - first\n  - second\nother:\n  key: value\n";
         let issues = rule.check(content, "test.yaml");
         assert!(issues.is_empty());
+    }
+
+    #[test]
+    fn test_nested_sequence_inside_mapping() {
+        // Regression test: nested sequences inside list items with mappings
+        // Bug was that Key context was lost when entering BlockSequenceStart,
+        // causing false positives for deeply nested items.
+        let rule = IndentationRule::new();
+        let content = r#"list:
+  - item1
+  - item2
+  - nested:
+      - subitem1
+      - subitem2
+"#;
+        let issues = rule.check(content, "test.yaml");
+        assert!(
+            issues.is_empty(),
+            "Should not report indentation errors for properly nested sequences: {:?}",
+            issues
+        );
+    }
+
+    #[test]
+    fn test_mixed_content_nested_structures() {
+        // Test the pattern from sample-rules/indentation/good.yaml
+        let rule = IndentationRule::new();
+        let content = r#"mixed:
+  scalar: value
+  list:
+    - item1
+    - item2
+  mapping:
+    key1: value1
+    key2: value2
+"#;
+        let issues = rule.check(content, "test.yaml");
+        assert!(
+            issues.is_empty(),
+            "Should not report indentation errors for mixed nested content: {:?}",
+            issues
+        );
     }
 }
